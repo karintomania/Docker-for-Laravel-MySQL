@@ -1,0 +1,30 @@
+version: "3.7"
+services:
+  web-server:
+    build:
+      dockerfile: php.Dockerfile
+      context: .
+    restart: always
+    volumes:
+      - "./html/:/var/www/html/"
+      - "./config/php/xdebug-local.ini:/usr/local/etc/php/conf.d/xdebug-local.ini"
+      - "./logs/apache2:/var/log/apache2/"
+      - "./config/apache2/000-default.conf:/etc/apache2/sites-available/000-default.conf"
+    ports:
+      - "80:80"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+      - "laravel-test.local:127.0.0.1"
+  database:
+    build:
+      dockerfile: mariadb.Dockerfile
+      context: .
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=laravel
+    volumes:
+      - ./database:/var/lib/mysql
+      - ./logs/mysql:/var/log/mysql
+    ports:
+        - "3306:3306"
